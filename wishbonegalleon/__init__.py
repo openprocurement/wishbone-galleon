@@ -7,10 +7,19 @@ from wishbone.module import ProcessModule
 from galleon import Mapper
 from jsonschema import RefResolver
 
+from .utils import TAGGERS
+
 
 class GalleonModule(ProcessModule):
 
-    def __init__(self, config, schema, mapping, destination="data"):
+    def __init__(
+            self,
+            config,
+            schema,
+            mapping,
+            tagger="",
+            destination="data"
+            ):
         ProcessModule.__init__(self, config)
         for name in ['inbox', 'outbox']:
             self.pool.createQueue(name)
@@ -22,17 +31,23 @@ class GalleonModule(ProcessModule):
             with open(schema) as _file:
                 schema = json.load(_file)
         self.mapper = Mapper(mapping, RefResolver.from_schema(schema))
+
+        if tagger and (tagger in TAGGERS):
+            self.tagger = TAGGERS[tagger]
     
     def consume(self, event):
         raw_data = event.dump()
         try:
-            mapped_data = self.mapper.apply(raw_data.get('data'))
-            if mapped_data:
-                event.set(mapped_data, event.kwargs.destination)
+            data = self.mapper.apply(raw_data.get('data'))
+            if data:
+                if hasattr(self, 'tagger'):
+                    data = self.tagger(data)
+
+                event.set(data, event.kwargs.destination)
                 self.submit(event, "outbox")
         except Exception as e:
             self.logging.error(
-                "Element {} is not mapped. skipping. Reason: {}".format(
+                "Event {} raised error, skipping. Reason: {}".format(
                     raw_data.get('id', ''), e
                     )
                 )

@@ -30,6 +30,9 @@ EXTRA = {
 ENTRY_POINTS = {
     'wishbone.module.process': [
         'galleon = wishbonegalleon:GalleonModule'
+    ],
+    'galleon.taggers': [
+        'ocds = wishbonegalleon.utils:ocds_tagger'
     ]
 }
 

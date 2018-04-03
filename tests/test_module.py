@@ -9,7 +9,7 @@ SCHEMA = {
     "type": "object",
     "properties": {
         "name": {"type": "string"},
-        "title": {"type": "string"}        
+        "title": {"type": "string"},
     }
 }
 MAPPING = {
@@ -30,6 +30,7 @@ DATA = {
 }
 
 
+
 def test_module_galleon():
     config = ActorConfig('galleon', 100, 1, {}, "")
     galleon = GalleonModule(
@@ -47,3 +48,23 @@ def test_module_galleon():
 
     one = getter(galleon.pool.queue.outbox)
     assert one.get() == {"name": "test", "title": "testing"}
+
+
+def test_module_tagger():
+    config = ActorConfig('galleon', 100, 1, {}, "")
+    galleon = GalleonModule(
+        config,
+        schema=SCHEMA,
+        mapping=MAPPING,
+        tagger='ocds'
+    )
+
+    galleon.pool.queue.inbox.disableFallThrough()
+    galleon.pool.queue.outbox.disableFallThrough()
+    galleon.start()
+
+    e = Event(DATA)
+    galleon.pool.queue.inbox.put(e)
+
+    one = getter(galleon.pool.queue.outbox)
+    assert one.get() == {"name": "test", "title": "testing", 'tag': ['tender']}
