@@ -5,6 +5,7 @@
 *.json
 *.yaml
 .eggs*
+.pytest*
 
 # Packages
 *.egg

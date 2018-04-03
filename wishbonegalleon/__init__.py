@@ -29,10 +29,11 @@ class GalleonModule(ProcessModule):
             mapped_data = self.mapper.apply(raw_data.get('data'))
             if mapped_data:
                 event.set(mapped_data, event.kwargs.destination)
+                self.submit(event, "outbox")
         except Exception as e:
             self.logging.error(
                 "Element {} is not mapped. skipping. Reason: {}".format(
                     raw_data.get('id', ''), e
                     )
                 )
-        self.submit(event, "outbox")
+        
