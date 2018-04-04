@@ -6,7 +6,8 @@ TAGGERS = {}
 def ocds_tagger(data):
     tags = ['tender']
     for key in ['contract', 'award']:
-        if "{}s".format(key) in data:
+        field = "{}s".format(key)
+        if field  in data and (data.get(field, '')):
             tags.append(key)
     data['tag'] = tags
     return data
