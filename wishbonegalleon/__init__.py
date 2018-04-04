@@ -36,15 +36,20 @@ class GalleonModule(ProcessModule):
             self.tagger = TAGGERS[tagger]
     
     def consume(self, event):
-        raw_data = event.dump()
+        raw_data = event.dump().get('data', {})
         try:
-            data = self.mapper.apply(raw_data.get('data'))
-            if data:
-                if hasattr(self, 'tagger'):
-                    data = self.tagger(data)
+            if raw_data and (not raw_data.get('id', '').startswith('_')):
+                data = self.mapper.apply(raw_data)
+                if data:
+                    if hasattr(self, 'tagger'):
+                        data = self.tagger(data)
 
-                event.set(data, event.kwargs.destination)
-                self.submit(event, "outbox")
+                    event.set(data, event.kwargs.destination)
+                    self.submit(event, "outbox")
+            else:
+                self.logging.info(
+                    "Empty data. skipping"
+                    )
         except Exception as e:
             self.logging.error(
                 "Event {} raised error, skipping. Reason: {}".format(

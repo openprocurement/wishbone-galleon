@@ -50,7 +50,6 @@ setuptools.setup(
     packages=setuptools.find_packages(),
 
     install_requires=INSTALL_REQUIRES,
-    test_requires=TEST_REQUIRES,
     extras_require=EXTRA,
     setup_requires=['pytest-runner'],
 
