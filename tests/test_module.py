@@ -46,8 +46,10 @@ def test_module_galleon():
     e = Event(DATA)
     galleon.pool.queue.inbox.put(e)
 
-    one = getter(galleon.pool.queue.outbox)
-    assert one.get() == {"name": "test", "title": "testing"}
+    one = getter(galleon.pool.queue.outbox).get()
+    if one:
+        one.pop("$schema")
+    assert one == {"name": "test", "title": "testing"}
 
 
 def test_module_tagger():
@@ -66,5 +68,7 @@ def test_module_tagger():
     e = Event(DATA)
     galleon.pool.queue.inbox.put(e)
 
-    one = getter(galleon.pool.queue.outbox)
-    assert one.get() == {"name": "test", "title": "testing", 'tag': ['tender']}
+    one = getter(galleon.pool.queue.outbox).get()
+    if one:
+        one.pop("$schema")
+    assert one == {"name": "test", "title": "testing", 'tag': ['tender']}
