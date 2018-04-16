@@ -1,7 +1,7 @@
 import setuptools
 
 
-VERSION = '1.0.0a1.dev1'
+VERSION = '1.0.0a1.dev2'
 DESCRIPTION = """
 Wishbone Encode modules to use galleon transforms
 """
