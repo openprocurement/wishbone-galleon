@@ -48,7 +48,7 @@ def test_module_galleon():
 
     one = getter(galleon.pool.queue.outbox).get()
     if one:
-        one.pop("$schema")
+        one.pop("$schema", "")
     assert one == {"name": "test", "title": "testing"}
 
 
@@ -70,5 +70,5 @@ def test_module_tagger():
 
     one = getter(galleon.pool.queue.outbox).get()
     if one:
-        one.pop("$schema")
+        one.pop("$schema", "")
     assert one == {"name": "test", "title": "testing", 'tag': ['tender']}
