@@ -38,7 +38,7 @@ class GalleonModule(ProcessModule):
     def consume(self, event):
         raw_data = event.dump().get('data', {})
         try:
-            if raw_data and (not raw_data.get('id', '').startswith('_')):
+            if raw_data and not raw_data.get('_id', '').startswith('_'):
                 data = self.mapper.apply(raw_data)
                 if data:
                     if hasattr(self, 'tagger'):
