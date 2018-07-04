@@ -1,25 +1,25 @@
-"""wishbonegalleon - Wishbone Encode modules to use galleon transforms"""
-
-import yaml
+""" wishbonegalleon - Wishbone Encode modules to use galleon transforms """
 import json
-
+import yaml
+from gevent.threadpool import ThreadPoolExecutor
 from wishbone.module import ProcessModule
-from galleon import Mapper
 from jsonschema import RefResolver
-
+from galleon import Mapper
 from .utils import TAGGERS
 
 
 class GalleonModule(ProcessModule):
-
+    """ Wishbone process module based on galleon transformations """
     def __init__(
             self,
             config,
             schema,
             mapping,
             tagger="",
-            destination="data"
-            ):
+            destination="data",
+            use_threads=False,
+            max_workers=4
+    ):
         ProcessModule.__init__(self, config)
         for name in ['inbox', 'outbox']:
             self.pool.createQueue(name)
@@ -34,12 +34,32 @@ class GalleonModule(ProcessModule):
 
         if tagger and (tagger in TAGGERS):
             self.tagger = TAGGERS[tagger]
-    
+        self.use_threads = use_threads
+        if self.use_threads:
+            self.executor = ThreadPoolExecutor(max_workers=max_workers)
+
     def consume(self, event):
+        """ Consume event, process it and push to output queue """
         raw_data = event.dump().get('data', {})
         try:
             if raw_data and not raw_data.get('_id', '').startswith('_'):
-                data = self.mapper.apply(raw_data)
+                title = raw_data.get('tiltle', '')
+                mode = raw_data.get('mode', '')
+                if mode and mode == 'test':
+                    self.logging.warn(
+                        "Test data. skipping"
+                    )
+                    return
+                if 'test' in title or 'тест' in title.lower():
+                    self.logging.warn(
+                        "Test data. skipping"
+                    )
+                    return
+                if self.use_threads:
+                    job = self.executor.submit(self.mapper.apply, (raw_data,))
+                    data = job.result()
+                else:
+                    data = self.mapper.apply(raw_data)
                 if data:
                     if hasattr(self, 'tagger'):
                         data = self.tagger(data)
