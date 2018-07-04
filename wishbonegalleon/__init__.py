@@ -56,7 +56,7 @@ class GalleonModule(ProcessModule):
                     )
                     return
                 if self.use_threads:
-                    job = self.executor.submit(self.mapper.apply, (raw_data,))
+                    job = self.executor.submit(self.mapper.apply, raw_data)
                     data = job.result()
                 else:
                     data = self.mapper.apply(raw_data)
