@@ -1,10 +1,9 @@
 """ wishbonegalleon - Wishbone Encode modules to use galleon transforms """
 import json
 import yaml
-from gevent.threadpool import ThreadPoolExecutor
-from wishbone.module import ProcessModule
 from jsonschema import RefResolver
 from galleon import Mapper
+from wishbone.module import ProcessModule
 from .utils import TAGGERS
 
 
@@ -17,8 +16,6 @@ class GalleonModule(ProcessModule):
             mapping,
             tagger="",
             destination="data",
-            use_threads=False,
-            max_workers=4
     ):
         ProcessModule.__init__(self, config)
         for name in ['inbox', 'outbox']:
@@ -34,9 +31,6 @@ class GalleonModule(ProcessModule):
 
         if tagger and (tagger in TAGGERS):
             self.tagger = TAGGERS[tagger]
-        self.use_threads = use_threads
-        if self.use_threads:
-            self.executor = ThreadPoolExecutor(max_workers=max_workers)
 
     def consume(self, event):
         """ Consume event, process it and push to output queue """
@@ -55,11 +49,7 @@ class GalleonModule(ProcessModule):
                         "Test data. skipping"
                     )
                     return
-                if self.use_threads:
-                    job = self.executor.submit(self.mapper.apply, raw_data)
-                    data = job.result()
-                else:
-                    data = self.mapper.apply(raw_data)
+                data = self.mapper.apply(raw_data)
                 if data:
                     if hasattr(self, 'tagger'):
                         data = self.tagger(data)
