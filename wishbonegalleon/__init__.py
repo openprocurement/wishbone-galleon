@@ -1,5 +1,5 @@
 """ wishbonegalleon - Wishbone Encode modules to use galleon transforms """
-import json
+import ujson
 import yaml
 from jsonschema import RefResolver
 from galleon import Mapper
@@ -15,6 +15,7 @@ class GalleonModule(ProcessModule):
             schema,
             mapping,
             tagger="",
+            with_hash=False,
             destination="data",
     ):
         ProcessModule.__init__(self, config)
@@ -26,9 +27,9 @@ class GalleonModule(ProcessModule):
                 mapping = yaml.load(_file)
         if not isinstance(schema, dict):
             with open(schema) as _file:
-                schema = json.load(_file)
+                schema = ujson.load(_file)
         self.mapper = Mapper(mapping, RefResolver.from_schema(schema))
-
+        self.with_hash = with_hash
         if tagger and (tagger in TAGGERS):
             self.tagger = TAGGERS[tagger]
 
@@ -53,6 +54,10 @@ class GalleonModule(ProcessModule):
                 if data:
                     if hasattr(self, 'tagger'):
                         data = self.tagger(data)
+                    if self.with_hash:
+                        pmtype = data['id'][:3]
+                        id_ = hash(ujson.dumps(data))
+                        data['id'] = "{}-{}".format(pmtype, abs(id_))
 
                     event.set(data, event.kwargs.destination)
                     self.submit(event, "outbox")

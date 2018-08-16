@@ -18,7 +18,8 @@ INSTALL_REQUIRES = [
     'setuptools',
     'wishbone',
     'galleon',
-    'pyyaml'
+    'pyyaml',
+    'ujson'
 ]
 TEST_REQUIRES = [
     'pytest',
