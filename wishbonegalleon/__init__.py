@@ -55,9 +55,9 @@ class GalleonModule(ProcessModule):
                     if hasattr(self, 'tagger'):
                         data = self.tagger(data)
                     if self.with_hash:
-                        pmtype = data['id'][:3]
-                        id_ = hash(ujson.dumps(data))
-                        data['id'] = "{}-{}".format(pmtype, abs(id_))
+                        pm_type = data.pop('id')[:3]
+                        new_id = hash(ujson.dumps(data))
+                        data['id'] = "{}{}".format(pm_type, abs(new_id))
 
                     event.set(data, event.kwargs.destination)
                     self.submit(event, "outbox")
