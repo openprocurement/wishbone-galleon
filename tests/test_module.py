@@ -1,3 +1,4 @@
+import ujson
 from wishbone.event import Event
 from wishbone.actor import ActorConfig
 from wishbone.utils.test import getter
@@ -37,6 +38,7 @@ def test_module_galleon():
         config,
         schema=SCHEMA,
         mapping=MAPPING,
+        processors=[]
     )
 
     galleon.pool.queue.inbox.disableFallThrough()
@@ -52,13 +54,13 @@ def test_module_galleon():
     assert one == {"name": "test", "title": "testing"}
 
 
-def test_module_tagger():
+def test_module_tag_ocds():
     config = ActorConfig('galleon', 100, 1, {}, "")
     galleon = GalleonModule(
         config,
         schema=SCHEMA,
         mapping=MAPPING,
-        tagger='ocds'
+        processors=['ocds'],
     )
 
     galleon.pool.queue.inbox.disableFallThrough()
@@ -72,3 +74,24 @@ def test_module_tagger():
     if one:
         one.pop("$schema", "")
     assert one == {"name": "test", "title": "testing", 'tag': ['tender']}
+
+
+
+def test_module_hashid():
+    config = ActorConfig('galleon', 100, 1, {}, "")
+    galleon = GalleonModule(
+        config,
+        schema=SCHEMA,
+        mapping=MAPPING,
+        processors=['hashid'],
+    )
+
+    galleon.pool.queue.inbox.disableFallThrough()
+    galleon.pool.queue.outbox.disableFallThrough()
+    galleon.start()
+
+    e = Event(DATA)
+    galleon.pool.queue.inbox.put(e)
+
+    one = getter(galleon.pool.queue.outbox).get()
+    assert 'id' in one

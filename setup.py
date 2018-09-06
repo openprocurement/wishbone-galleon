@@ -1,7 +1,7 @@
 import setuptools
 
 
-VERSION = '1.0.0a1.dev3'
+VERSION = '1.1.0a1.dev3'
 DESCRIPTION = """
 Wishbone Encode modules to use galleon transforms
 """
@@ -32,8 +32,12 @@ ENTRY_POINTS = {
     'wishbone.module.process': [
         'galleon = wishbonegalleon:GalleonModule'
     ],
-    'galleon.taggers': [
-        'ocds = wishbonegalleon.utils:ocds_tagger'
+    'wishbonegalleon.processors': [
+        'ocds = wishbonegalleon.utils:ocds_tagger',
+        'hashid = wishbonegalleon.utils:hashid',
+    ],
+    'wishbonegalleon.filters': [
+        'test = wishbonegalleon.filters:filter_test'
     ]
 }
 
