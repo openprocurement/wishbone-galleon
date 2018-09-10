@@ -1,13 +1,16 @@
 variables:
   COMPONENT_PROJECT_ID: 467
-  COMPONENT_PROJECT_PIPELINE_TRIGGER: bd423cb2dc1f02621adf3c44487fe3
-  CI_DOCKER_REGISTRY: ocds-jenkins-master.office.quintagroup.com:5000
-  CI_DOCKER_IMAGE: wishbone
+  COMPONENT_PROJECT_PIPELINE_TRIGGER: "$WISHBONE_COMPONENT_PROJECT_PIPELINE_TRIGGER"
+  CI_DOCKER_REGISTRY: docker.io
+  CI_DOCKER_IMAGE: spageorgia/wishbone
   CI_DOCKER_TAG: ci
 
 
 before_script:
+  - docker login -u "$DOCKER_HUB_USERNAME" -p "$DOCKER_HUB_PASSWORD" "$CI_DOCKER_REGISTRY"
   - docker info
+after_script:
+  - docker logout  "$CI_DOCKER_REGISTRY"
 
 test:
   script:
@@ -15,5 +18,5 @@ test:
     - "curl -XPOST --form token=$COMPONENT_PROJECT_PIPELINE_TRIGGER --form ref=master https://gitlab.quintagroup.com/api/v4/projects/$COMPONENT_PROJECT_ID/trigger/pipeline"
   tags:
     - spage
-#  only:
-#    - master
+  only:
+    - master
