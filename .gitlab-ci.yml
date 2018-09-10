@@ -1,0 +1,19 @@
+variables:
+  COMPONENT_PROJECT_ID: 467
+  COMPONENT_PROJECT_PIPELINE_TRIGGER: bd423cb2dc1f02621adf3c44487fe3
+  CI_DOCKER_REGISTRY: ocds-jenkins-master.office.quintagroup.com:5000
+  CI_DOCKER_IMAGE: wishbone
+  CI_DOCKER_TAG: ci
+
+
+before_script:
+  - docker info
+
+test:
+  script:
+    - docker run --rm -u root -v `pwd`:/package:Z -w /package --entrypoint /bin/bash $CI_DOCKER_REGISTRY/$CI_DOCKER_IMAGE:$CI_DOCKER_TAG -c "(pip install .[test] && pytest tests/); chown -R `id -u`:`id -g` /package"
+    - "curl -XPOST --form token=$COMPONENT_PROJECT_PIPELINE_TRIGGER --form ref=master https://gitlab.quintagroup.com/api/v4/projects/$COMPONENT_PROJECT_ID/trigger/pipeline"
+  tags:
+    - spage
+#  only:
+#    - master
