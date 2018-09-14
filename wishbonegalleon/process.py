@@ -19,6 +19,7 @@ class GalleonModule(ProcessModule):
             with_hash=False,
             filters=['test'],
             destination="data",
+            selection="data"
     ):
         ProcessModule.__init__(self, config)
         for name in ['inbox', 'outbox']:
@@ -41,7 +42,9 @@ class GalleonModule(ProcessModule):
 
     def consume(self, event):
         """ Consume event, process it and push to output queue """
-        input_data = event.dump().get('data', {})
+        input_data = event.get(self.kwargs.selection)
+        if not input_data:
+            return
         try:
             if self.filters:
                 for filterfunc in self.filters:
@@ -59,8 +62,9 @@ class GalleonModule(ProcessModule):
                     "Empty data. skipping"
                     )
         except Exception as e:
+            import pdb; pdb.set_trace()
             self.logging.error(
                 "Event {} raised error, skipping. Reason: {}".format(
-                    raw_data.get('id', ''), e
+                    input_data.get('id', ''), e
                     )
                 )

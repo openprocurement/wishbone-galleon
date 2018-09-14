@@ -8,7 +8,7 @@ PROCESSORS = {}
 def load_datafile(path):
     if path.endswith('json'):
         loader = ujson.load
-    if path.endswith('yaml'):
+    elif path.endswith('yaml') or path.endswith('yml'):
         loader = yaml.load
     else:
         raise Exception("invalid file extension")
