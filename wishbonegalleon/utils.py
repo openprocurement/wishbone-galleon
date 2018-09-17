@@ -17,11 +17,13 @@ def load_datafile(path):
 
 
 def ocds_tagger(instance, data):
-    tags = ['tender']
+    tags = []
     for key in ['contract', 'award']:
         field = "{}s".format(key)
         if field  in data and (data.get(field, '')):
             tags.append(key)
+    if 'tender' in data:
+        tags.append('tender')
     data['tag'] = tags
     instance.logging.debug('Tagged doc {} as {}'.format(data.get('id'), tags))
     return data

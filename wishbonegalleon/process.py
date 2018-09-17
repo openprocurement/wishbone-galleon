@@ -62,7 +62,6 @@ class GalleonModule(ProcessModule):
                     "Empty data. skipping"
                     )
         except Exception as e:
-            import pdb; pdb.set_trace()
             self.logging.error(
                 "Event {} raised error, skipping. Reason: {}".format(
                     input_data.get('id', ''), e
