@@ -73,7 +73,7 @@ def test_module_tag_ocds():
     one = getter(galleon.pool.queue.outbox).get()
     if one:
         one.pop("$schema", "")
-    assert one == {"name": "test", "title": "testing", 'tag': ['tender']}
+    assert one == {"name": "test", "title": "testing", "tag": []}
 
 
 
