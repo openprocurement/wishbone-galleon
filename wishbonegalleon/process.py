@@ -15,7 +15,7 @@ class GalleonModule(ProcessModule):
             config,
             schema,
             mapping,
-            processors=['ocds', 'hashid'],
+            processors=['ocds'],
             with_hash=False,
             filters=['test'],
             destination="data",

@@ -34,7 +34,6 @@ ENTRY_POINTS = {
     ],
     'wishbonegalleon.processors': [
         'ocds = wishbonegalleon.utils:ocds_tagger',
-        'hashid = wishbonegalleon.utils:hashid',
     ],
     'wishbonegalleon.filters': [
         'test = wishbonegalleon.filters:filter_test'
