@@ -1,11 +1,14 @@
 import ujson
 import yaml
+import requests
 from pkg_resources import iter_entry_points
 
 
 PROCESSORS = {}
 
 def load_datafile(path):
+    if path.startswith('http'):
+        return requests.get(path).json()
     if path.endswith('json'):
         loader = ujson.load
     elif path.endswith('yaml') or path.endswith('yml'):
