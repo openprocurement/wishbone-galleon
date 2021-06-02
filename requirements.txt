@@ -32,5 +32,5 @@ scalpl==0.2.5
 six==1.11.0
 typecast==0.3.3
 Unidecode==1.0.22
-urllib3==1.23
+urllib3==1.26.5
 wishbone==3.1.3
